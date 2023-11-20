@@ -46,7 +46,7 @@ class OpenAIMessages(BaseModel):
 
 
 class GPT35Turbo:
-    model_name = "gpt-3.5-turbo"
+    model_name = "gpt-3.5-turbo-16k"
     client = OpenAI()
 
     @classmethod

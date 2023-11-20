@@ -66,5 +66,5 @@ PROFESSIONAL AFFILIATIONS/COMMUNITY SERVICE
 Institute of Industrial Engineering - Engineers Without Borders
 """
     logger.info(resume_text)
-    response = ParseResumeSkills.parse(resume_text)
-    print(response.choices[0].message)
+    skills = ParseResumeSkills.parse(resume_text)
+    print(skills)

@@ -54,4 +54,8 @@ class ParseResumeSkills:
         ]
         logging.info(f"messages: {json.dumps(messages)}")
         response = cls.model.create(messages, functions=[cls.function])
-        return response
+
+        message = response.choices[0].message
+        logger.info(message)
+        skills = ResumeSkills.parse_raw(message.function_call.arguments)
+        return skills
