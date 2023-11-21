@@ -1,0 +1,38 @@
+Job Listing: Machine Learning Engineer II
+
+Quantum Analytics Inc.
+Location: Denver, CO
+
+Apply directly on Denver, CO - JobHub
+Posted: 3 days ago
+Salary: $22 to $30 per hour
+Employment Type: Full-time
+
+Job Highlights:
+Identified by JobHub from the original job post
+
+Responsibilities:
+
+    As a Machine Learning Engineer II at Quantum Analytics Inc., you will be at the forefront of pioneering large-scale computational advertising and machine learning applications. Your primary responsibilities include designing and developing innovative products that play a crucial role in optimizing ad impressions allocation and determining advertising costs.
+
+    Take the lead in defining project requirements, crafting software designs, coding to specifications, and establishing continuous integration testing. Support the seamless deployment and operation of products in a live environment, ensuring a top-tier experience for our customers.
+
+    Assume complete ownership of technology decisions, architecture, and testing for your features. Manage code deployments into the production environment and oversee operations for the products under your domain. Collaborate closely with a dynamic team consisting of machine learning scientists, product managers, and other high-performing engineers.
+
+Benefits:
+
+    Estimated Salary: $22 to $30 per hour based on qualifications
+
+Job Description:
+Are you intrigued by the cutting edge of Machine Learning in a dynamic internet-scale environment? Quantum Analytics Inc. is at the forefront of developing state-of-the-art large-scale computational advertising and machine learning applications, utilizing terabytes of data.
+
+Our Advanced Analytics team is focused on creating algorithms and high-performance, petabyte-scale distributed systems to measure the outcomes of advertising. Process billions of ad impressions daily from across the internet, fueling our display advertising algorithms.
+
+As a Machine Learning Engineer II, you'll be instrumental in designing and developing products that lie at the core of advertising strategies. You will influence how billions of impressions are allocated to advertisers and the corresponding costs. Your responsibilities include defining requirements, creating software designs, coding, establishing continuous integration testing, and providing ongoing support for products in real-world usage.
+
+Take charge of your technology choices, architectural decisions, and feature testing. Manage the end-to-end process from code deployment into the production environment to operational oversight for the products you own. Collaborate with a dynamic team of machine learning scientists, product managers, and other high-performing engineers.
+
+We're actively seeking Software Development Engineers (SDEs) with a keen interest in EMR/Spark, Sagemaker, and other AWS, big-data, and ML technologies. Join Quantum Analytics Inc. and be part of the future of internet-scale Machine Learning.
+
+#quantumanalyticsjob
+Estimated Salary: $22 to $30 per hour based on qualifications

@@ -19,25 +19,25 @@ class InterviewCandidate:
 
     _system_prompt = OpenAIMessage(
         role=OpenAIRole.system,
-        content="""Your are an expert interviewer. You will be given a job listing and you will interview a candidate.
-        Your task is to ask questions for the candidate to answer and try to determine if they are
-        a good fit for the position. Be sure to probe deeply with your questions, but balance your
-        line of questioning with probing out all areas of the candidate's experience. If
-        the candidate does not have the direct experience you are looking for, ask questions to determine
-        if they have similar skills or experiences that might be applicable. Focus on the job listing and
-        make sure you have the information you need from the candidate to address all of its aspects.
+        content="""
+As an expert interviewer, your task is to assess a candidate's suitability for a given job. You will be provided with the candidate's resume and a job listing. Use the resume to formulate questions aimed at determining if the candidate is a good fit for the position. Focus on aspects outlined in the job listing that are not explicitly covered in the resume.
 
+Here are the guidelines:
 
-        Your tone should be neutral and analytical. Only ask questions and do not remark on responses.
-        If you are asking specifically about the candidate's experience, explicitly use the company name in your question.
+- Ask one question at a time, each addressing a different area of the job listing.
+- Wait for a response from the candidate before asking the next question.
+- Your questions should be designed to uncover whether the candidate possesses relevant experience not highlighted in the resume.
+- Avoid redundant questions that can be adequately answered by the resume.
+- Begin by assessing if the candidate is broadly aligned with the position before delving into specific details.
+- Maintain a neutral and analytical tone throughout the interview. Refrain from offering remarks on the candidate's responses.
+- If a question pertains specifically to the candidate's experience, incorporate the company name into the question.
 
-        Here is a short version of the applicant's resume:
-        {resume}
+To illustrate, you might start with a statement about missing experience and then proceed to inquire further. For instance, "Company X is seeking someone with Y experience; however, I noticed your resume emphasizes Z. Can you provide more insights into your experience related to Y?"
 
-        Here is the job listing to use for this task:
-        {job_listing}
+Please keep your questions succinct and to the point. Skip any question if the candidate's resume already adequately addresses the relevant experience or skills.
 
-        Start by asking one question of the candidate.
+Here is the job listing to use for this task:
+{job_listing}
         """,
     )
 
@@ -71,12 +71,10 @@ class InterviewCandidate:
     ) -> tuple[OpenAIMessages, str]:
         messages = OpenAIMessages(
             messages=[
-                cls._system_prompt.format(
-                    resume=resume.short_version(), job_listing=job_listing
-                ),
+                cls._system_prompt.format(job_listing=job_listing),
                 cls._user_prompt.format(
-                    answer="I am ready to begin. Ask me a question."
-                ).model_dump(),
+                    answer=f"Here is my resume, let's begin:\n{resume.short_version()}"
+                ),
             ]
         )
         logging.debug(f"messages: {list(messages)}")

@@ -38,7 +38,8 @@ class Education(BaseModel):
     courses: Optional[list[str]] = Field(description="Courses")
 
     def __str__(self):
-        return f"{self.school} - {self.degree} (self.field_of_study), from: {self.date_from}, to: {self.date_to}"
+        field_of_study = "" if self.field_of_study is None else self.field_of_study
+        return f"{self.school} - {self.degree} ({field_of_study}), from: {self.date_from}, to: {self.date_to}"
 
 
 class Resume(BaseModel):
@@ -60,7 +61,10 @@ class Resume(BaseModel):
     def short_version(self):
         education = "Education:\n  " + "\n  ".join(map(str, self.education))
         skills = "Skills:\n  " + "\n  ".join(map(str, self.skills))
-        personal = "Personal/Professional:\n  " + "\n  ".join(self.personal)
+        if self.personal is not None:
+            personal = "Personal/Professional:\n  " + "\n  ".join(self.personal)
+        else:
+            personal = ""
         experiences = "Experience:\n " + "\n ".join(map(str, self.experiences))
         return f"Objective: {self.objective}\n{skills}\n{experiences}\n{education}\n{personal}"
 
