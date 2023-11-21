@@ -3,6 +3,7 @@ import json
 from typing import Optional
 
 from api.openai_api import OpenAIMessages, OpenAIMessage, OpenAIRole, GPT35Turbo
+from tasks.models.resume import Resume
 
 from pydantic import BaseModel, Field
 
@@ -18,14 +19,20 @@ class InterviewCandidate:
 
     _system_prompt = OpenAIMessage(
         role=OpenAIRole.system,
-        content="""Your are an expert interviewer. You will be given a job listing.
+        content="""Your are an expert interviewer. You will be given a job listing and you will interview a candidate.
         Your task is to ask questions for the candidate to answer and try to determine if they are
-        a good fit for the position. Be sure to probe deeper and deeper with your questions. If
+        a good fit for the position. Be sure to probe deeply with your questions, but balance your
+        line of questioning with probing out all areas of the candidate's experience. If
         the candidate does not have the direct experience you are looking for, ask questions to determine
-        if they have similar skills or experiences that might be applicable.
+        if they have similar skills or experiences that might be applicable. Focus on the job listing and
+        make sure you have the information you need from the candidate to address all of its aspects.
 
-        This should be conversational. You job is to ask tough questions and challenge the applicant in order
-        to get the most accurate representation of their capabilities.
+
+        Your tone should be neutral and analytical. Only ask questions and do not remark on responses.
+        If you are asking specifically about the candidate's experience, explicitly use the company name in your question.
+
+        Here is a short version of the applicant's resume:
+        {resume}
 
         Here is the job listing to use for this task:
         {job_listing}
@@ -45,8 +52,8 @@ class InterviewCandidate:
     )
 
     @classmethod
-    def interview(cls, job_listing: str):
-        messages, question = cls.begin_interview(job_listing)
+    def interview(cls, resume: Resume, job_listing: str):
+        messages, question = cls.begin_interview(resume, job_listing)
         while True:
             answer = str(input(question))
             if answer.lower() == "exit":
@@ -59,10 +66,14 @@ class InterviewCandidate:
         logger.info("Successful interview.")
 
     @classmethod
-    def begin_interview(cls, job_listing) -> tuple[OpenAIMessages, str]:
+    def begin_interview(
+        cls, resume: Resume, job_listing: str
+    ) -> tuple[OpenAIMessages, str]:
         messages = OpenAIMessages(
             messages=[
-                cls._system_prompt.format(job_listing=job_listing),
+                cls._system_prompt.format(
+                    resume=resume.short_version(), job_listing=job_listing
+                ),
                 cls._user_prompt.format(
                     answer="I am ready to begin. Ask me a question."
                 ).model_dump(),
