@@ -46,6 +46,9 @@ class Resume(BaseModel):
     skills: list[Skill] = Field(
         description="Any listed skill that would interest a potential employer."
     )
+    personal: Optional[list[str]] = Field(
+        description="Any hobbies, volunteering, professional organizations, etc"
+    )
 
 
 class ParseResume:

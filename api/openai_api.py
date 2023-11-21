@@ -32,8 +32,12 @@ class OpenAIMessage(BaseModel):
 class OpenAIMessages(BaseModel):
     messages: list[OpenAIMessage]
 
+    def append(self, item: OpenAIMessage):
+        assert isinstance(item, OpenAIMessage)
+        self.messages = self.messages + [item]
+
     def __iter__(self):
-        return iter(map(lambda x: x.json, self.messages))
+        return iter(map(lambda x: x.model_dump(), self.messages))
 
 
 # class GPT35TurboAssistant:
@@ -53,11 +57,13 @@ class GPT35Turbo:
     @classmethod
     @backoff.on_exception(backoff.expo, APIConnectionError, max_tries=3)
     def create(cls, messages: OpenAIMessages, functions: Optional[list[dict]] = None):
-        completion = cls.client.chat.completions.create(
-            model=cls.model_name,
-            messages=list(messages),
-            functions=functions,
-        )
+        kwargs = {
+            "model": cls.model_name,
+            "messages": list(messages),
+        }
+        if functions:
+            kwargs["functions"] = functions
+        completion = cls.client.chat.completions.create(**kwargs)
         return completion
 
 

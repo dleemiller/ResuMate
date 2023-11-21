@@ -68,3 +68,6 @@ Institute of Industrial Engineering - Engineers Without Borders
     logger.info(resume_text)
     skills = ParseResume.parse(resume_text)
     print(skills)
+    with open("resume.json", "w") as fh:
+        import json
+        json.dump(skills.model_dump_json(), fh, indent=4)
