@@ -55,7 +55,7 @@ class Resume(BaseModel):
         description="Any listed skill that would interest a potential employer."
     )
     personal: Optional[list[str]] = Field(
-        description="Any hobbies, volunteering, professional organizations, etc"
+        description="Any hobbies, volunteering, professional organizations, or certifications"
     )
 
     def short_version(self):
