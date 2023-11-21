@@ -21,8 +21,9 @@ class OpenAIMessage(BaseModel):
     content: str
 
     def format(self, **kwargs):
-        self.content = self.content.format(**kwargs)
-        return self
+        new_self = self.copy()
+        new_self.content = new_self.content.format(**kwargs)
+        return new_self
 
     class Config:
         use_enum_values = True

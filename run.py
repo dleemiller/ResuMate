@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from tasks.parse_resume import ParseResumeSkills
+from tasks.parse_resume import ParseResume
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -66,5 +66,5 @@ PROFESSIONAL AFFILIATIONS/COMMUNITY SERVICE
 Institute of Industrial Engineering - Engineers Without Borders
 """
     logger.info(resume_text)
-    skills = ParseResumeSkills.parse(resume_text)
+    skills = ParseResume.parse(resume_text)
     print(skills)
