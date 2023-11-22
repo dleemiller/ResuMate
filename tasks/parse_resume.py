@@ -2,10 +2,10 @@ import logging
 import json
 from typing import Optional
 
-from api.openai_api import OpenAIMessages, OpenAIMessage, OpenAIRole, GPT35Turbo
+from api.openai_api import OpenAIMessages, OpenAIMessage, OpenAIRole
+from api.openai_api import GPT4 as GPTApi
+from tasks.dot_logger import DotLogger
 from tasks.models.resume import Resume
-
-logger = logging.getLogger(__name__)
 
 
 class ParseResume:
@@ -13,7 +13,7 @@ class ParseResume:
     Use LLM to parse resume into JSON.
     """
 
-    model = GPT35Turbo
+    model = GPTApi
 
     system_prompt = OpenAIMessage(
         role=OpenAIRole.system,
@@ -37,13 +37,14 @@ class ParseResume:
     }
 
     @classmethod
-    def parse(cls, content: str) -> Resume:
+    def parse(cls, content: str, logger: logging.Logger) -> Resume:
         messages = [
             cls.system_prompt.model_dump(),
             cls._user_prompt.format(content=content).model_dump(),
         ]
-        logging.info(f"messages: {json.dumps(messages)}")
-        response = cls.model.create(messages, functions=[cls.function])
+        logger.info(f"messages: {json.dumps(messages)}")
+        with DotLogger(logger):
+            response = cls.model.create(messages, functions=[cls.function])
 
         message = response.choices[0].message
         logger.info(message)

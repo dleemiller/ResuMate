@@ -76,14 +76,14 @@ button:hover {
     overflow-wrap: break-word;
     word-wrap: break-word;
     width: 100%;
-    height: 80vh;
+    height: calc(100vh - 235px);
     padding: 10px;
     resize: vertical;
     border: none;
     font-family: 'JetBrains Mono', monospace;
-    font-size: calc(1em - 1pt); /* Decrease font size by 1 point */
+    font-size: calc(1em - 1pt);
+    overflow-y: scroll;
 }
-
 @media only screen and (max-width: 767px) {
     .parse-interface {
         width: 100%;

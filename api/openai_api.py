@@ -40,19 +40,10 @@ class OpenAIMessages(BaseModel):
         return iter(map(lambda x: x.model_dump(), self.messages))
 
 
-# class GPT35TurboAssistant:
-#     def __init__(self, client, assistant):
-#         self.client = client
-#         self.assistant = assistant
-#         self.thread = client.beta.threads.create()
-#
-#     def create(self, message: OpenAIMessage):
-#         pass
 
-
-class GPT35Turbo:
-    model_name = "gpt-3.5-turbo-16k"
-    client = OpenAI()
+class GPTModel:
+    # model_name = "gpt-3.5-turbo"
+    # client = OpenAI()
 
     @classmethod
     @backoff.on_exception(backoff.expo, APIConnectionError, max_tries=3)
@@ -67,13 +58,14 @@ class GPT35Turbo:
         return completion
 
 
-#     def __enter__(self, name: str, instructions: str):
-#         assistant = client.beta.assistants.create(
-#             name=name,
-#             instructions=instructions,
-#             model=self.model_name,
-#         )
+class GPT35Turbo(GPTModel):
+    model_name = "gpt-3.5-turbo"
+    client = OpenAI()
 
+
+class GPT4(GPTModel):
+    model_name = "gpt-4"
+    client = OpenAI()
 
 if __name__ == "__main__":
     messages = OpenAIMessages(

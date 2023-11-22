@@ -7,10 +7,25 @@
             <button onclick="runCode()">Run</button>
             <button onclick="saveFile()">Save</button>
         </div>
-        <textarea class="file-content" id="file-content"></textarea>
+        <textarea class="file-content" id="file-content" readonly></textarea>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('parser_message', function (msg) {
+            var fileContent = document.getElementById('file-content');
+            fileContent.value += '\n' + msg;
+            scrollToBottom(); // Call scrollToBottom after appending new content
+        });
+
+        // Clear the text box on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('file-content').value = '';
+        });
+
         function loadFile() {
             var input = document.createElement('input');
             input.type = 'file';
@@ -50,6 +65,9 @@
         }
 
         function runCode() {
+            // Display "parsing resume..." in the text box
+            document.getElementById('file-content').value = 'Parsing resume...';
+
             // Call the Flask route to run the code
             fetch('/run_code')
                 .then(response => {
@@ -69,16 +87,26 @@
         }
 
         function saveFile() {
-            var content = document.getElementById('file-content').value;
-            if (content) {
-                var blob = new Blob([content], { type: 'application/json' });
-                var a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = 'parsed_data.json';
-                a.click();
-            } else {
-                alert('No content to save.');
-            }
+            fetch('/download_parsed_resume')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to download parsed resume.');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    saveAs(blob, 'parsed_resume.json');
+                })
+                .catch(error => {
+                    console.error('Error downloading parsed resume:', error);
+                    alert('Error downloading parsed resume.');
+                });
+        }
+
+        // JavaScript code to scroll to the bottom of the text box
+        function scrollToBottom() {
+            var fileContent = document.getElementById('file-content');
+            fileContent.scrollTop = fileContent.scrollHeight;
         }
     </script>
 {% endblock %}
