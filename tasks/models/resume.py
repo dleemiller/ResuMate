@@ -4,9 +4,6 @@ from pydantic import BaseModel, Field
 
 
 class Skill(BaseModel):
-    described: str = Field(
-        description="Briefly describe what the skill is and who uses it."
-    )
     skill: str = Field(description="A skill that may interest an employer")
     years: Optional[float] = Field(description="Number of years of experience")
 
@@ -69,10 +66,77 @@ class Resume(BaseModel):
         return f"Objective: {self.objective}\n{skills}\n{experiences}\n{education}\n{personal}"
 
 
+## Note, this must be regenerated if the schema is changed
+resume_schema = """
+{
+  "properties": {
+    "name": { "type": "string", "description": "Applicant's name" },
+    "email": { "type": "string", "description": "Applicant's email" },
+    "phone": { "type": "string", "description": "Applicant's phone" },
+    "objective": { "type": "string", "description": "Objective statement" },
+    "experiences": {
+      "description": "Responsibilities or accomplishments at a prior job.",
+      "items": {
+        "properties": {
+          "place_of_work": { "type": "string", "description": "Place of work" },
+          "job_title": { "type": "string", "description": "Job title" },
+          "date_start": { "type": "string", "description": "Starting date of job" },
+          "date_end": { "type": "string", "description": "Ending date of job" },
+          "experience": { "type": "array", "items": { "type": "string" }, "description": "Responsibility or accomplishment" }
+        },
+        "required": ["place_of_work", "job_title"],
+        "type": "object"
+      },
+      "description": "Experiences",
+      "type": "array"
+    },
+    "education": {
+      "description": "Educational history",
+      "items": {
+        "properties": {
+          "school": { "type": "string", "description": "School issuing diploma" },
+          "degree": { "type": "string", "description": "Degree awarded" },
+          "date_from": { "type": "string", "description": "Date started school" },
+          "date_to": { "type": "string", "description": "Date finished school" },
+          "field_of_study": { "type": "string", "description": "Field of study" },
+          "courses": { "type": "array", "items": { "type": "string" }, "description": "Courses" }
+        },
+        "required": ["school", "degree"],
+        "type": "object"
+      },
+      "description": "Education",
+      "type": "array"
+    },
+    "skills": {
+      "description": "Any listed skill that would interest a potential employer.",
+      "items": {
+        "properties": {
+          "skill": { "type": "string", "description": "A skill that may interest an employer" },
+          "years": { "type": "number", "description": "Number of years of experience" }
+        },
+        "required": ["skill", "years"],
+        "type": "object"
+      },
+      "description": "Skills",
+      "type": "array"
+    },
+    "personal": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Any hobbies, volunteering, professional organizations, or certifications"
+    }
+  },
+  "required": ["name", "email", "phone", "experiences", "education", "skills"],
+  "description": "Resume",
+  "type": "object"
+}
+"""
+
 if __name__ == "__main__":
-    with open("test_resume.json", "r") as fh:
-        import json
+    # with open("test_resume.json", "r") as fh:
+    #     import json
 
-        resume = json.load(fh)
+    #     resume = json.load(fh)
 
-    print(Resume.parse_raw(resume).short_version())
+    # print(Resume.parse_raw(resume).short_version())
+    print(Resume.schema())

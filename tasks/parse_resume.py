@@ -3,9 +3,9 @@ import json
 from typing import Optional
 
 from api.openai_api import OpenAIMessages, OpenAIMessage, OpenAIRole
-from api.openai_api import GPT4 as GPTApi
+from api.openai_api import GPT35Turbo as GPTApi
 from tasks.dot_logger import DotLogger
-from tasks.models.resume import Resume
+from tasks.models.resume import Resume, resume_schema
 
 
 class ParseResume:
@@ -14,6 +14,7 @@ class ParseResume:
     """
 
     model = GPTApi
+    temperature = 0.1
 
     system_prompt = OpenAIMessage(
         role=OpenAIRole.system,
@@ -33,7 +34,8 @@ class ParseResume:
     function = {
         "name": "write_skills",
         "description": "Writes the list of skills.",
-        "parameters": Resume.schema(),
+        # "parameters": Resume.schema(),
+        "parameters": json.loads(resume_schema)
     }
 
     @classmethod
@@ -44,9 +46,9 @@ class ParseResume:
         ]
         logger.info(f"messages: {json.dumps(messages)}")
         with DotLogger(logger):
-            response = cls.model.create(messages, functions=[cls.function])
+            response = cls.model.create(messages, function=cls.function, temperature=cls.temperature)
 
         message = response.choices[0].message
         logger.info(message)
-        skills = Resume.parse_raw(message.function_call.arguments)
-        return skills
+        resume = Resume.parse_raw(message.tool_calls[0].function.arguments)
+        return resume

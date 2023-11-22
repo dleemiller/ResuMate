@@ -47,13 +47,15 @@ class GPTModel:
 
     @classmethod
     @backoff.on_exception(backoff.expo, APIConnectionError, max_tries=3)
-    def create(cls, messages: OpenAIMessages, functions: Optional[list[dict]] = None):
+    def create(cls, messages: OpenAIMessages, function: Optional[dict] = None, temperature: float = 1.0):
         kwargs = {
             "model": cls.model_name,
             "messages": list(messages),
+            "temperature": temperature
         }
-        if functions:
-            kwargs["functions"] = functions
+        if function:
+            kwargs["tools"] = [{"type": "function", "function": function}]
+            kwargs["tool_choice"] = {"type": "function", "function": {"name": function["name"]}}
         completion = cls.client.chat.completions.create(**kwargs)
         return completion
 

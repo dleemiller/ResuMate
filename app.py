@@ -1,11 +1,12 @@
 import json
 import logging
+import os
 import sys
 from datetime import datetime
 
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify, session
-from flask import send_file
+from flask import send_file, Response
 from flask_socketio import SocketIO, emit
 
 load_dotenv()
@@ -52,7 +53,7 @@ def process_file():
         processed_content = f"{datetime.now()} - {content}"
 
         # Store the processed content in the session
-        session['processed_content'] = processed_content
+        session['processed_content'] = content
 
         return jsonify({'processed_content': processed_content})
     except Exception as e:
@@ -81,7 +82,7 @@ def run_code():
         resume = ParseResume.parse(resume_text, parser_logger)
         parser_logger.info('Parsing completed successfully.')
 
-        json_resume = json.dump(resume.model_dump_json(), fh, indent=4)
+        json_resume = resume.model_dump_json(indent=4)
 
         # Store the processed content in the session
         session['parsed_resume'] = json_resume
@@ -95,26 +96,16 @@ def run_code():
 
 @app.route('/download_parsed_resume')
 def download_parsed_resume():
-    try:
-        parsed_resume = session.get('parsed_resume', '')
-        if not parsed_resume:
-            raise ValueError('Parsed resume is empty.')
-
-        # Create a temporary file to store the parsed resume content
-        temp_file_path = 'parsed_resume.json'
-        with open(temp_file_path, 'w') as temp_file:
-            temp_file.write(parsed_resume)
-
-        # Send the file for download
-        return send_file(temp_file_path, as_attachment=True, download_name='parsed_resume.json')
-    except Exception as e:
-        import traceback
-        parser_logger.error(traceback.format_exc())
-        return jsonify({'error': str(traceback.format_exc())})
-    finally:
-        # Clean up: remove the temporary file
-        if os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
+    json_data = session.get('parsed_resume')
+    if json_data:
+        result = json.dumps(json_data)
+        return Response(
+            result,
+            mimetype="application/json",
+            headers={"Content-Disposition": "attachment;filename=parsed_resume.json"}
+        )
+    else:
+        return "No data found", 404
 
 
 if __name__ == '__main__':
