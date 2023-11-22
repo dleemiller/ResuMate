@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="chat-interface">
+        <div class="chat-display" id="chat-display"></div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button onclick="sendMessage()">Submit</button>
+        </div>
+    </div>
+{% endblock %}
+

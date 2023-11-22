@@ -1,0 +1,84 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="parse-interface">
+        <div class="input-container">
+            <button onclick="loadFile()">Load</button>
+            <button onclick="runCode()">Run</button>
+            <button onclick="saveFile()">Save</button>
+        </div>
+        <textarea class="file-content" id="file-content"></textarea>
+    </div>
+
+    <script>
+        function loadFile() {
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.txt';
+            input.onchange = function (event) {
+                var file = event.target.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        // Send the file content to Flask for processing
+                        fetch('/process_file', {
+                            method: 'POST',
+                            body: JSON.stringify({ content: e.target.result }),
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to process file.');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Display the processed content in the text box
+                            document.getElementById('file-content').value = data.processed_content;
+                        })
+                        .catch(error => {
+                            console.error('Error processing file:', error);
+                            document.getElementById('file-content').innerText = 'Error processing file.';
+                        });
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function runCode() {
+            // Call the Flask route to run the code
+            fetch('/run_code')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to run code.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Display the result in the text box
+                    document.getElementById('file-content').value = data.result;
+                })
+                .catch(error => {
+                    console.error('Error running code:', error);
+                    document.getElementById('file-content').innerText = 'Error running code.';
+                });
+        }
+
+        function saveFile() {
+            var content = document.getElementById('file-content').value;
+            if (content) {
+                var blob = new Blob([content], { type: 'application/json' });
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'parsed_data.json';
+                a.click();
+            } else {
+                alert('No content to save.');
+            }
+        }
+    </script>
+{% endblock %}
