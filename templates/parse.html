@@ -6,6 +6,7 @@
             <button onclick="loadFile()">Load</button>
             <button onclick="runCode()">Run</button>
             <button onclick="saveFile()">Save</button>
+            <button onclick="downloadFile()">Download</button>
         </div>
         <textarea class="file-content" id="file-content" readonly></textarea>
     </div>
@@ -86,7 +87,7 @@
                 });
         }
 
-        function saveFile() {
+        function downloadFile() {
             fetch('/download_parsed_resume')
                 .then(response => {
                     if (!response.ok) {
@@ -101,6 +102,11 @@
                     console.error('Error downloading parsed resume:', error);
                     alert('Error downloading parsed resume.');
                 });
+        }
+
+        // JavaScript code to instruct flask server to save the data in the session variable '/save_parsed_resume'
+        function saveFile() {
+            fetch('/save_parsed_resume', {method: 'POST'});
         }
 
         // JavaScript code to scroll to the bottom of the text box
