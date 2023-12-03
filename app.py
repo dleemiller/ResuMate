@@ -22,7 +22,32 @@ parser_logger = logging.getLogger("parser")
 
 
 class SocketIOHandler(logging.Handler):
+    """
+    A logging handler that streams logs over a websocket connection using the flask-socketio library.
+
+    This class extends the logging.Handler base class and overrides the emit method to send log records as messages through a socket.io connection.
+    It is designed to be used with Flask applications, which allows for real-time streaming of logs from the server to connected clients over websockets.
+
+    Attributes:
+        None
+
+    Methods:
+        emit(record) - Sends log records through a socket.io connection.
+    """
+
     def emit(self, record):
+        """
+        Overrides the logging.Handler's emit method to send log records as messages over a websocket.
+
+        The method formats a log record into a message using the format method inherited from the base class,
+        and then emits this message on the 'parser_message' channel of the socketio connection.
+
+        Args:
+            record (logging.LogRecord): A log record to be formatted and sent.
+
+        Returns:
+            None
+        """
         parse_message = self.format(record)
         socketio.emit("parser_message", parse_message)
 
@@ -51,25 +76,54 @@ def revise():
 
 
 @app.route("/process_file", methods=["POST"])
-def process_file():
+def process_file() -> tuple:
+    """Processes a file by adding current date and time to its content.
+
+    Returns:
+        A JSON object with the processed content or an error message if any exception occurred.
+    """
     try:
-        data = request.get_json()
-        content = data.get("content", "")
+        data = request.get_json()  # type: dict
+        content = data.get("content", "")  # type: str
         if not content:
             raise ValueError("File content is empty.")
 
         # Process the file content (add datetime information)
-        processed_content = f"{datetime.now()} - {content}"
+        processed_content = f"{datetime.now()} - {content}"  # type: str
 
         # Store the processed content in the session
-        session["processed_content"] = content
+        session["processed_content"] = content  # type: str
 
-        return jsonify({"processed_content": processed_content})
+        return jsonify({"processed_content": processed_content}), 200
     except Exception as e:
         import traceback
 
         parser_logger.error(traceback.format_exc())
-        return jsonify({"error": str(traceback.format_exc())})
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/process_json", methods=["POST"])
+def process_json() -> tuple:
+    """Processes a JSON file by adding to a session variable called `parsed_resume`.
+
+    Returns:
+        A JSON object with the processed content or an error message if any exception occurred.
+    """
+    try:
+        data = request.get_json()  # type: dict
+
+        if not data:
+            raise ValueError("JSON data is empty.")
+
+        # Process and store the parsed JSON in the session variable `parsed_resume`
+        session["parsed_resume"] = data
+
+        return jsonify({"processed_content": data}), 200
+    except Exception as e:
+        import traceback
+
+        parser_logger.error(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
 
 
 @socketio.on("connect")
@@ -136,7 +190,6 @@ def download_parsed_resume():
 
 @app.route("/save_parsed_resume", methods=["POST"])
 def save_parsed_resume():
-    # new code here...
     """
     This function handles the route for saving a JSON file of parsed resume data.
 
@@ -148,22 +201,19 @@ def save_parsed_resume():
     """
     try:
         parsed_resume = session.get("parsed_resume")
+        cache_dir = "cache"  # Set your cache directory here
 
-        # If resume is not empty, convert to JSON and write into file
         if parsed_resume:
-            filename = secure_filename("parsed_resume.json")  # Ensure filename is safe
+            filename = secure_filename("parsed_resume.json")
 
-            # Assuming `parsed_resume` is already a JSON-like object.
-            with open(os.path.join("cache", filename), "w") as write_file:
-                # Convert the Python dictionary to a string and then to a file.
-                json.dump(json.loads(str(parsed_resume)), write_file, indent=4)
+            with open(os.path.join(cache_dir, filename), "w") as write_file:
+                json.dump(
+                    parsed_resume, write_file, indent=4
+                )  # Dump directly to file without converting to string
         return jsonify({"status": "success"}), 200
 
     except Exception as e:
-        print(
-            "An error occurred while saving parsed resume: ", str(e)
-        )  # Log the exception
-
+        logger.exception("An error occurred while saving parsed resume")
         return (
             jsonify({"error": "Failed to save parsed resume", "message": str(e)}),
             500,
