@@ -69,6 +69,11 @@ def parse():
 def interview():
     return render_template("interview.html")
 
+@app.route("/start-interview", methods=["POST"])
+def start_interview():
+    print("interview click")
+    return jsonify({"message": "started"}), 200
+
 
 @app.route("/revise")
 def revise():
