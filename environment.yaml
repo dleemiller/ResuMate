@@ -8,6 +8,7 @@ dependencies:
       - backoff==2.2
       - bidict==0.22
       - flask-socketio==5.3
+      - pydantic==1.10.13
       - python-dotenv==1.0
       - python-engineio==4.8
       - python-socketio==5.10

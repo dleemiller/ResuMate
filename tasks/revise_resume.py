@@ -73,7 +73,7 @@ Here is the job listing to use for this task:
             messages = cls.interact(messages, answer)
 
         with open("revised_resume.json", "w") as fh:
-            json.dump(messages.model_dump(), fh, indent=4)
+            json.dump(messages.dict(), fh, indent=4)
 
         logger.info("Success.")
 
