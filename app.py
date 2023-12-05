@@ -56,7 +56,7 @@ parser_logger.addHandler(SocketIOHandler())
 
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "your_secret_key"  # Change this to a random secret key
+app.config["SECRET_KEY"] = os.getenv("RESUMATE_SECRET_KEY")
 socketio = SocketIO(app)
 
 
@@ -206,7 +206,7 @@ def save_parsed_resume():
     """
     try:
         parsed_resume = session.get("parsed_resume")
-        cache_dir = "cache"  # Set your cache directory here
+        cache_dir = os.getenv("RESUMATE_CACHE_DIR", "cache")
 
         if parsed_resume:
             filename = secure_filename("parsed_resume.json")
