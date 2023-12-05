@@ -5,7 +5,7 @@ from typing import Optional
 from api.openai_api import OpenAIMessages, OpenAIMessage, OpenAIRole
 from api.openai_api import GPT35Turbo as GPTApi
 from tasks.dot_logger import DotLogger
-from tasks.models.resume import Resume, resume_schema
+from tasks.models.resume import Resume
 
 
 class ParseResume:
@@ -33,9 +33,8 @@ class ParseResume:
 
     function = {
         "name": "write_skills",
-        "description": "Writes the list of skills.",
-        # "parameters": Resume.schema(),
-        "parameters": json.loads(resume_schema)
+        "description": "Writes the list of skills and experiences.",
+        "parameters": Resume.model_json_schema()
     }
 
     @classmethod
