@@ -37,8 +37,7 @@ class OpenAIMessages(BaseModel):
         self.messages = self.messages + [item]
 
     def __iter__(self):
-        return iter(map(lambda x: x.model_dump(), self.messages))
-
+        return iter(map(lambda x: x.dict(), self.messages))
 
 
 class GPTModel:
@@ -47,15 +46,23 @@ class GPTModel:
 
     @classmethod
     @backoff.on_exception(backoff.expo, APIConnectionError, max_tries=3)
-    def create(cls, messages: OpenAIMessages, function: Optional[dict] = None, temperature: float = 1.0):
+    def create(
+        cls,
+        messages: OpenAIMessages,
+        function: Optional[dict] = None,
+        temperature: float = 1.0,
+    ):
         kwargs = {
             "model": cls.model_name,
             "messages": list(messages),
-            "temperature": temperature
+            "temperature": temperature,
         }
         if function:
-            kwargs["tools"] = [{"type": "function", "function": function}]
-            kwargs["tool_choice"] = {"type": "function", "function": {"name": function["name"]}}
+            kwargs["tools"] = [function]
+            kwargs["tool_choice"] = {
+                "type": "function",
+                "function": {"name": function["function"]["name"]},
+            }
         completion = cls.client.chat.completions.create(**kwargs)
         return completion
 
@@ -68,6 +75,7 @@ class GPT35Turbo(GPTModel):
 class GPT4(GPTModel):
     model_name = "gpt-4"
     client = OpenAI()
+
 
 if __name__ == "__main__":
     messages = OpenAIMessages(

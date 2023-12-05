@@ -11,8 +11,8 @@ if __name__ == "__main__":
         resume_text = fh.read()
 
     logger.info(resume_text)
-    resume = ParseResume.parse(resume_text)
+    resume = ParseResume.parse(resume_text, logger)
     with open("examples/resume.json", "w") as fh:
         import json
 
-        json.dump(resume.model_dump_json(), fh, indent=4)
+        json.dump(resume.json(), fh, indent=4)
