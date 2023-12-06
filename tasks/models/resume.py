@@ -1,11 +1,14 @@
 from typing import Optional
 
 from pydantic import BaseModel, Field
+from tasks.models.function_call import convert_pydantic_to_openai_tool
 
 
 class Skill(BaseModel):
     skill: str = Field(description="A skill that may interest an employer")
-    years: Optional[float] = Field(description="Number of years of experience", default=None)
+    years: Optional[float] = Field(
+        description="Number of years of experience", default=None
+    )
 
     def __str__(self):
         years_str = "" if self.years is None else f" - {self.years} years"
@@ -17,7 +20,9 @@ class Experience(BaseModel):
     job_title: str = Field(description="Job title")
     date_start: Optional[str] = Field(description="Starting date of job", default=None)
     date_end: Optional[str] = Field(description="Ending date of job", default=None)
-    experience: list[str] = Field(description="Responsibility or accomplishment", default=[])
+    experience: list[str] = Field(
+        description="Responsibility or accomplishment", default=[]
+    )
 
     def __str__(self):
         date_start = "n/a" if not self.date_start else self.date_start
@@ -44,19 +49,26 @@ class Resume(BaseModel):
     email: Optional[str] = Field(description="Applicant's email", default=None)
     phone: Optional[str] = Field(description="Applicant's phone", default=None)
     objective: Optional[str] = Field(
-        description="Objective statement or summary of skills", default=None,
+        description="Objective statement or summary of skills",
+        default=None,
     )
     experiences: list[Experience] = Field(
-        description="Responsibilities or accomplishments at a prior job.", default=[],
+        description="Responsibilities or accomplishments at a prior job.",
+        default=[],
     )
     education: list[Education] = Field(description="Educational history", default=[])
     skills: list[Skill] = Field(
-        description="Any listed skill that would interest a potential employer.", default=[],
+        description="Any listed skill that would interest a potential employer.",
+        default=[],
     )
     personal: list[str] = Field(
         description="Any hobbies, volunteering, professional organizations, or certifications",
         default=[],
     )
+
+    @classmethod
+    def function_call(cls, function_name, function_description):
+        return convert_pydantic_to_openai_tool(cls, function_name, function_description)
 
     def short_version(self):
         education = "Education:\n  " + "\n  ".join(map(str, self.education))

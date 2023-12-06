@@ -61,7 +61,7 @@ Here is the job listing to use for this task:
             messages, question = cls.interact(messages, answer)
 
         with open("interview.json", "w") as fh:
-            json.dump(messages.model_dump(), fh, indent=4)
+            json.dump(messages.dict(), fh, indent=4)
 
         logger.info("Successful interview.")
 

@@ -31,21 +31,22 @@ class ParseResume:
         """,
     )
 
-    function = {
-        "name": "write_skills",
-        "description": "Writes the list of skills and experiences.",
-        "parameters": Resume.model_json_schema()
-    }
+    function = Resume.function_call(
+        function_name="write_skills",
+        function_description="Writes the list of skills and experiences.",
+    )
 
     @classmethod
     def parse(cls, content: str, logger: logging.Logger) -> Resume:
         messages = [
-            cls.system_prompt.model_dump(),
-            cls._user_prompt.format(content=content).model_dump(),
+            cls.system_prompt.dict(),
+            cls._user_prompt.format(content=content).dict(),
         ]
-        logger.info(f"messages: {json.dumps(messages)}")
+        logger.info(f"messages: {json.dumps(messages, indent=4)}")
         with DotLogger(logger):
-            response = cls.model.create(messages, function=cls.function, temperature=cls.temperature)
+            response = cls.model.create(
+                messages, function=cls.function, temperature=cls.temperature
+            )
 
         message = response.choices[0].message
         logger.info(message)
