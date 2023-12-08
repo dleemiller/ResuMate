@@ -1,26 +1,33 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <div class="container">
-        <div class="job-interface">
-            <h2>Paste Your Job Listing</h2>
-            <textarea id="job-input" placeholder="Please paste your job listing here..."></textarea>
-            <button id="start-interview-btn">Start Interview</button>
-            <button id="finish-interview-btn">Finish Interview</button>
+<div class="container-fluid h-100 d-flex flex-column">
+    <div class="row flex-grow-1">
+        <div class="col-md-6 p-0 d-flex flex-column">
+            <h2 class="p-4">Paste Your Job Listing</h2>
+            
+            <form action="/upload" class="dropzone flex-grow-1 d-flex flex-column justify-content-center" id="my-awesome-dropzone"></form>
+            
+            <div class="input-group p-4">
+                <button id="start-interview-btn" class="btn btn-primary flex-grow-1 mr-2">Start Interview</button>
+                <button id="finish-interview-btn" class="btn btn-secondary flex-grow-1 ml-2">Finish Interview</button>
+            </div>
         </div>
 
-        <div class="chat-interface">
+        <div class="col-md-6 p-4 d-flex flex-column">
             <h2>Interview Simulation</h2>
-            <div id="loading">Loading...</div>
-            <div id="progress"><span id="progress-indicator">0%</span></div>
-            <div id="chat-display"></div>
+            <div id="loading" class="text-muted">Loading...</div>
+            <div id="progress" class="mb-3"><div id="progress-bar" class="progress-bar"></div></div>
+            <div id="chat-display" class="flex-grow-1 border p-2 rounded bg-white" style="overflow-y: scroll;"></div>
+
+            <div class="chat-input">
+                <textarea id="user-input" placeholder="Type your message..."></textarea>
+                <button id="submit-btn" class="btn btn-primary submit-btn" disabled><i class="fas fa-paper-plane"></i></button>
+            </div>
+
         </div>
     </div>
+</div>
 
-    <div class="input-wrapper">
-        <textarea id="user-input" placeholder="Type your message..."></textarea>
-        <button id="submit-btn" disabled>&#9650;</button>
-    </div>
-
-    <script src="scripts/interview.js"></script>
+<script src="static/js/interview.js"></script>
 {% endblock %}

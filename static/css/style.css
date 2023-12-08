@@ -1,3 +1,115 @@
+body, html {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5dc;
+    color: #333;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-fluid {
+    flex: 1;
+}
+
+h2 {
+    color: #001f3f;
+    font-size: 18px;
+    font-weight: 600;
+} 
+
+button:disabled,
+button[disabled]{
+    background: #ccc !important;
+}
+
+
+
+.chat-input {
+    position: relative;
+}
+
+#user-input {
+    padding-right: 50px;
+}
+
+
+.submit-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 0.7rem;
+}
+
+#loading,
+#progress {
+    display: none;
+}
+
+#progress {
+    height: 20px;
+}
+
+#progress .progress-bar {
+    width: 0;
+    height: 100%;
+    background-color: #6c757d;
+}
+
+.dropzone {
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dropzone .dz-message {
+    color: #333;
+    font-weight: 500;
+}
+
+.chat-message {
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+}
+
+.user-message {
+    border-color: #007BFF;
+    position: relative;
+    padding-left: 50px;
+}
+
+
+.bot-message {
+    border-color: #6C757D;
+    position: relative;
+    padding-right: 50px;
+}
+
+.user-message:before {
+    content: '\f007';  /* Unicode for user icon in Font Awesome */
+    position: absolute;
+    left: -10px;
+    top: 0;
+    font-family: 'Font Awesome 5 Free'; 
+    font-weight: 900;
+}
+
+.bot-message:before {
+    content: '\f544'; /* Unicode for robot icon in Font Awesome */
+    position: absolute;
+    right: -10px;
+    top: 0;
+    font-family: 'Font Awesome 5 Free'; 
+    font-weight: 900;
+}
+
 body {
     font-family: 'JetBrains Mono', monospace;
     background-color: #f5f5dc;

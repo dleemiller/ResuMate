@@ -28,7 +28,7 @@ function loadFile() {
                 // check if it's a JSON file
                 if (contentType === "application/json") {
                     // Send the JSON content to Flask for processing
-                    fetch('/process_json', {
+                    fetch('/parse/process_json', {
                         method: 'POST',
                         body: JSON.stringify({ content: content }),
                         headers: {
@@ -53,7 +53,7 @@ function loadFile() {
 
                 // If it's a text file, send the content to '/process_file' route
                 else {
-                    fetch('/process_file', {
+                    fetch('/parse/process_file', {
                         method: 'POST',
                         body: JSON.stringify({ content: content }),
                         headers: {
@@ -105,7 +105,7 @@ function runCode() {
 }
 
 function downloadFile() {
-    fetch('/download_parsed_resume')
+    fetch('/parse/download_parsed_resume')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to download parsed resume.');
@@ -123,7 +123,7 @@ function downloadFile() {
 
 // JavaScript code to instruct flask server to save the data in the session variable '/save_parsed_resume'
 function saveFile() {
-    fetch('/save_parsed_resume', { method: 'POST' });
+    fetch('/parse/save_parsed_resume', { method: 'POST' });
 }
 
 // JavaScript code to scroll to the bottom of the text box

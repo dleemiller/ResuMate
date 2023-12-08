@@ -85,3 +85,47 @@ document.getElementById('user-input').addEventListener('input', function () {
     submitButton.disabled = this.value.trim() === ''; // Disable if no text
 });
 
+
+function displayUserMessage(message) {
+    var messageBox = document.createElement('div');
+    messageBox.className = 'chat-message user-message';
+    messageBox.innerText = message;
+    document.getElementById('chat-display').appendChild(messageBox);
+}
+
+function displayBotMessage(message) {
+    var messageBox = document.createElement('div');
+    messageBox.className = 'chat-message bot-message';
+    messageBox.innerText = message;
+    document.getElementById('chat-display').appendChild(messageBox);
+}
+
+$(document).ready(function(){
+    // call the function here
+    displayBotMessage('Hello!');
+});
+
+
+Dropzone.options.myAwesomeDropzone = {
+    paramName: "file",
+    maxFilesize: 2, 
+    acceptedFiles: '.txt',
+    dictDefaultMessage: "Drag a file here or click to upload",
+    clickable: true,
+    height: 'auto',
+    init: function() {
+        this.on("success", function(file, responseText) {
+            let textArea = document.createElement('textarea');
+            textArea.id = 'job-input';
+            textArea.classList.add('form-control');
+            textArea.readOnly = true;
+            textArea.style.resize = 'none';
+            textArea.style.height = '100%';
+            textArea.textContent = responseText;
+
+            let dropzoneArea = document.getElementById('my-awesome-dropzone');
+            dropzoneArea.innerHTML = '';
+            dropzoneArea.appendChild(textArea);
+        });
+    }
+};
