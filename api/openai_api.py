@@ -1,10 +1,11 @@
 import backoff
 import logging
 from enum import Enum
-from typing import Optional
+from typing import Optional, List, Type, Dict, Any
 
 from openai import OpenAI, APIConnectionError
 from pydantic import BaseModel
+from api import function_call
 
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ class OpenAIMessage(BaseModel):
 
 
 class OpenAIMessages(BaseModel):
-    messages: list[OpenAIMessage]
+    messages: List[OpenAIMessage]
 
     def append(self, item: OpenAIMessage):
         assert isinstance(item, OpenAIMessage)
@@ -84,3 +85,32 @@ if __name__ == "__main__":
 
     completion = GPT35Turbo.create(messages)
     print(completion.choices[0].message)
+
+
+class ChatCompletionFunction:
+    name: str
+    description: str
+    param_model: Type[BaseModel]
+    gpt_model: Type[GPTModel]
+
+    @classmethod
+    def parse_function_params(cls, fn_params: Dict[str, Any]) -> Type[BaseModel]:
+        return cls.param_model.parse_raw(fn_params)
+
+    @classmethod
+    def call(cls, messages: OpenAIMessages, temperature: float = 0.0) -> Type[BaseModel]:
+        function = function_call.convert_pydantic_to_openai_tool(
+            cls.param_model, cls.name, cls.description,
+        )
+        response = cls.gpt_model.create(
+            cls._serialize_messages(messages), function=function, temperature=temperature,
+        )
+        message = response.choices[0].message
+        fn_params = message.tool_calls[0].function.arguments
+        return cls.parse_function_params(fn_params)
+    
+    @classmethod
+    def _serialize_messages(cls, messages: OpenAIMessages) -> List[Dict[str, Any]]:
+        return [
+            m.dict() for m in messages
+        ]
