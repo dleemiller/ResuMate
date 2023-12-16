@@ -1,7 +1,6 @@
 from typing import Optional
 
 from pydantic import BaseModel, Field
-from tasks.models.function_call import convert_pydantic_to_openai_tool
 
 
 class Skill(BaseModel):
@@ -65,10 +64,6 @@ class Resume(BaseModel):
         description="Any hobbies, volunteering, professional organizations, or certifications",
         default=[],
     )
-
-    @classmethod
-    def function_call(cls, function_name, function_description):
-        return convert_pydantic_to_openai_tool(cls, function_name, function_description)
 
     def short_version(self):
         education = "Education:\n  " + "\n  ".join(map(str, self.education))
