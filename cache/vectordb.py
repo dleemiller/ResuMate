@@ -3,7 +3,7 @@ import os
 from copy import copy
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Tuple
 
 import chromadb
 
@@ -57,14 +57,16 @@ class ResponseCache:
     def cache_question(cls, r: RecruiterResponse):
         cls.collection.add(documents=[r.question], metadatas=[r.metadata], ids=[r.id])
 
+    @staticmethod
+    def parse_nearest(results) -> Tuple[str, float]:
+        if results.get("distances") and results["distances"][0]:
+            return results["metadatas"][0][0], results["distances"][0][0]
+
     @classmethod
-    def threshold_query(cls, query: str, threshold: float = 0.15) -> Optional[str]:
+    def threshold_query(cls, query: str, threshold: float = 0.25) -> Optional[str]:
         results = cls.collection.query(query_texts=[query], n_results=1)
-        if (
-            results.get("distances")
-            and results["distances"][0]
-            and results["distances"][0][0] > threshold
-        ):
-            return results
+        nearest_meta, nearest_dist = ResponseCache.parse_nearest(results)
+        if nearest_dist < threshold:
+            return nearest_meta.get("answer")
         else:
             return None
