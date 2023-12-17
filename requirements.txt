@@ -9,3 +9,4 @@ python-engineio==4.8
 python-socketio==5.10
 simple-websocket==1.0
 wsproto==1.2
+chromadb==0.4.20
