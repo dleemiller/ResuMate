@@ -1,23 +1,24 @@
 from enum import Enum
 from pydantic import BaseModel, Field
 
-
 class Audience(Enum):
     candidate = "candidate"
     hiring_manager = "hiring_manager"
 
-
 class InterviewStep(BaseModel):
+    phase: int = Field(
+        description="Indicate the current phase: 1 for Resume Review, 2 for Interview, 3 for Recommendation."
+    )
     think_out_loud: str = Field(
-        description="identify what experience is missing from the candidate's resume"
+        description="Reflect on the available information step by step. Determine if the job requirements have been addressed. Guide the next question based on this reflection."
     )
-    job_requirement: str = Field(
-        description="the specific part of the job listing you want to determine experience for"
+    job_requirement: str = Field( 
+        description="Define the specific skill or experience from the job listing to explore next."
     )
+    brainstorm: str = Field(description="Step by step, list available information potentially relating to the job requirement. Reason how to ask a question that will provide novel information. Explain why your reasoning is valid.")
     audience: Audience = Field(
-        description="candidate or hiring_manager, any message to the hiring_manager will terminate the interview"
+        description="Choose 'candidate' to continue the interview, 'hiring_manager' to conclude and summarize."
     )
-    phase: int = Field(description="current phase of the interview process, 1, 2 or 3")
     message: str = Field(
-        description="one question for the candidate or your full letter of recommendation for the hiring manager"
+        description="Compose a question for the candidate, or summarize findings for the hiring manager."
     )
