@@ -8,13 +8,14 @@ class Audience(Enum):
 
 
 class InterviewStep(BaseModel):
-    think_out_loud: str = Field(description="identify what is missing from the resume")
+    think_out_loud: str = Field(description="identify what experience is missing from the candidate's resume")
+    job_requirement: str = Field(
+        description="the specific part of the job listing you want to determine experience for"
+    )
     next_action: str = Field(
-        description="description of what you need to accomplish next"
+        description="describe your next action"
     )
-    job_requirement_reasoning: str = Field(
-        description="the part of the job listing this will elucidate and how"
-    )
+
     audience: Audience = Field(
         description="candidate or hiring_manager, any message to the hiring_manager will terminate the interview"
     )

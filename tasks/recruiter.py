@@ -12,6 +12,7 @@ from api.openai_api import (
     ChatCompletionFunction,
 )
 from api.openai_api import GPT35Turbo as GPTApi
+from cache.vectordb import ResponseCache, RecruiterResponse, CacheList
 from tasks.dot_logger import DotLogger
 from tasks.models.recruiter import InterviewStep, Audience
 
@@ -26,6 +27,7 @@ class RecruitActionFunction(ChatCompletionFunction):
 class Recruiter:
     function = RecruitActionFunction
     temperature = 1
+    cache = ResponseCache.new()
 
     _system_prompt = OpenAIMessage(
         role=OpenAIRole.system,
@@ -69,11 +71,11 @@ Guidelines:
 # Thought
 {thought}
 
+# Requirement
+{requirement}
+
 # Next Action
 {next_action}
-
-# Reasoning
-{reasoning}
 
 # Message to {audience}
 {message}
@@ -88,6 +90,7 @@ Guidelines:
                 content=f"Here is my resume, ask me a question:\n{resume}"
             ),
         ]
+        cls.cache.set_cache(CacheList.recruiter)
 
         while True:
             response = cls.function.call(messages, temperature=cls.temperature)
@@ -97,7 +100,7 @@ Guidelines:
                 assistant_msg = cls._assistant.format(
                     thought=response.think_out_loud,
                     next_action=response.next_action,
-                    reasoning=response.job_requirement_reasoning,
+                    requirement=response.job_requirement,
                     audience=response.audience.value,
                     message=response.message,
                 )
@@ -105,10 +108,13 @@ Guidelines:
                 print(assistant_msg.content)
 
                 # check for cached response
-                cached_response = None
+                cached_response = cls.cache.threshold_query(response.message)
                 if isinstance(cached_response, str) and cached_response:
                     user_input = cached_response
                 else:
                     user_input = input(response.message)
                 candidate_msg = cls._user_prompt.format(content=user_input)
+
+                r = RecruiterResponse(question=response.message, answer=user_input)
+                cls.cache.cache_question(r)
                 messages += [assistant_msg, candidate_msg]
