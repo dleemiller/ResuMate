@@ -7,8 +7,10 @@ from typing import Optional, List, Dict
 
 import chromadb
 
+
 class CacheList(Enum):
     recruiter = "recruiter"
+
 
 @dataclass
 class RecruiterResponse:
@@ -24,10 +26,10 @@ class RecruiterResponse:
     def metadata(self):
         return {"answer": self.answer}
 
-class ResponseCache:
 
+class ResponseCache:
     @classmethod
-    def new(cls, path:str="./cache/resumate.db"):
+    def new(cls, path: str = "./cache/resumate.db"):
         cls = copy(cls)
         if os.path.exists(path):
             cls.load()
@@ -38,14 +40,13 @@ class ResponseCache:
         # create collections for different steps
         for cache_name in CacheList:
             cls.client.create_collection(
-                name=cache_name.value,
-                metadata={"hnsw:space": "cosine"}
+                name=cache_name.value, metadata={"hnsw:space": "cosine"}
             )
- 
+
         return cls
 
     @classmethod
-    def load(cls, path:str="./cache/resumate.db"):
+    def load(cls, path: str = "./cache/resumate.db"):
         cls.client = chromadb.PersistentClient(path=path)
 
     @classmethod
@@ -54,22 +55,16 @@ class ResponseCache:
 
     @classmethod
     def cache_question(cls, r: RecruiterResponse):
-        cls.collection.add(
-            documents=[r.question],
-            metadatas=[r.metadata],
-            ids=[r.id]
-        )
+        cls.collection.add(documents=[r.question], metadatas=[r.metadata], ids=[r.id])
 
     @classmethod
-    def threshold_query(cls, query: str, threshold: float=0.15) -> Optional[str]:
-        results = cls.collection.query(
-            query_texts=[query],
-            n_results=1
-        )
-        if results.get("distances") and results["distances"][0] and results["distances"][0][0] > threshold:
+    def threshold_query(cls, query: str, threshold: float = 0.15) -> Optional[str]:
+        results = cls.collection.query(query_texts=[query], n_results=1)
+        if (
+            results.get("distances")
+            and results["distances"][0]
+            and results["distances"][0][0] > threshold
+        ):
             return results
         else:
             return None
-
-
-
