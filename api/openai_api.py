@@ -73,8 +73,22 @@ class GPT35Turbo(GPTModel):
     client = OpenAI()
 
 
+class GPT35Turbo1106(GPTModel):
+    """
+    Improved instrution following
+    """
+
+    model_name = "gpt-3.5-turbo-1106"
+    client = OpenAI()
+
+
 class GPT4(GPTModel):
     model_name = "gpt-4"
+    client = OpenAI()
+
+
+class GPT41106Preview(GPTModel):
+    model_name = "gpt-4-1106-preview"
     client = OpenAI()
 
 
@@ -98,19 +112,23 @@ class ChatCompletionFunction:
         return cls.param_model.parse_raw(fn_params)
 
     @classmethod
-    def call(cls, messages: OpenAIMessages, temperature: float = 0.0) -> Type[BaseModel]:
+    def call(
+        cls, messages: OpenAIMessages, temperature: float = 0.0
+    ) -> Type[BaseModel]:
         function = function_call.convert_pydantic_to_openai_tool(
-            cls.param_model, cls.name, cls.description,
+            cls.param_model,
+            cls.name,
+            cls.description,
         )
         response = cls.gpt_model.create(
-            cls._serialize_messages(messages), function=function, temperature=temperature,
+            cls._serialize_messages(messages),
+            function=function,
+            temperature=temperature,
         )
         message = response.choices[0].message
         fn_params = message.tool_calls[0].function.arguments
         return cls.parse_function_params(fn_params)
-    
+
     @classmethod
     def _serialize_messages(cls, messages: OpenAIMessages) -> List[Dict[str, Any]]:
-        return [
-            m.dict() for m in messages
-        ]
+        return [m.dict() for m in messages]
