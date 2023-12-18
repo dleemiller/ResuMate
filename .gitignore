@@ -42,7 +42,6 @@ htmlcov/
 .nox/
 .coverage
 .coverage.*
-.cache
 nosetests.xml
 coverage.xml
 *.cover
@@ -160,7 +159,3 @@ cython_debug/
 #.idea/
 #
 *.swp
-
-# ResuMate files
-cache/*
-!cache/.gitkeep
