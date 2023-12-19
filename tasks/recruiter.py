@@ -11,43 +11,44 @@ from api.openai_api import (
     OpenAIRole,
     ChatCompletionFunction,
 )
-from api.openai_api import GPT35Turbo as GPTApi
+from api.openai_api import GPT41106Preview as GPTApi
 from cache.vectordb import ResponseCache, RecruiterResponse, CacheList
 from tasks.dot_logger import DotLogger
 from tasks.models.recruiter import InterviewStep, Audience
 
 
 system_prompt = """
-As a technical recruiter, evaluate a candidate for {job_listing}. Begin with Phase 1, the resume review, followed by Phase 2, the interview, and finally, conclude with Phase 3, the recommendation. Strictly adhere to this phase order for a structured evaluation process.
+As a technical recruiter, evaluate a candidate for {job_listing}.
 
-Phase 1: Resume Review
-- Start by contrasting the position with skills and experiences in the resume. Write your thoughts step by step. This is the initial phase and forms the basis for the interview questions.
+Phase 1: Job/Resume Review
+- Exhaustively contrast each requirement for position with skills and experiences in the resume. Write your thoughts step by step. This is the initial phase and forms the basis for the interview questions.
 - Identify and ask your first question, based on the largest disparity you identify between the position and the resume.
 
 Phase 2: Interview
-- After completing the resume review, ask interview questions based on insights gained. Dynamically adapt the questions based on previous answers, ensuring to explore different areas of the job listing.
+- After completing the review, ask interview questions based on insights gained. Dynamically adapt the questions based on previous answers, ensuring to explore different areas of the job listing.
 - Aim to cover all job aspects, ensuring a comprehensive understanding of the candidate's capabilities. Avoid repetitive questioning; move to new topics within 2 questions.
-- Respond effectively to the candidate's inquiries about additional questions, ensuring clear and concise communication.
+- Use chain of thought reasoning to determine the optimal question for obtaining novel information about the candidate.
+- Message your question to the candidate.
 
 Phase 3: Recommendation
-- Summarize your findings in a letter to the hiring manager. This phase concludes the interview process.
-- The recommendation should reflect a comprehensive assessment covering all relevant aspects of the job requirements.
+- Summarize your findings in a message to the hiring manager. This phase concludes the interview process.
+- The recommendation should reflect a comprehensive assessment, outlining all details for how the candidate connects to each requirement.
 
 Guidelines:
 - Follow the phase order strictly: 1 -> 2 -> 3 (finished)
 - Ensure each phase is fully addressed before moving to the next.
-- Conclude the interview only after all job aspects have been sufficiently explored and understood.
+- Conclude the interview only after all job requirements have been explored and understood.
 - Maintain clear and effective communication throughout the interview process.
 """
 
 assistant_prompt = """
-# Thought (Phase {phase})
+# Chain of Thought (Phase {phase})
 {thought}
 
-# Requirement
+# Job Requirement
 {requirement}
 
-# Brainstorm
+# Question Brainstorming
 {brainstorm}
 
 # Message to {audience}
@@ -99,7 +100,7 @@ class Recruiter:
         messages = [
             cls._system_prompt.format(job_listing=job),
             cls._user_prompt.format(
-                content=f"Here is my resume:\n{resume}. Proceed to phase 1: comprehensive resume review and follow up question."
+                content=f"Here is my resume:\n{resume}.\n\nPhase 1: begin"
             ),
         ]
 
